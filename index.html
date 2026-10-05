@@ -86,31 +86,130 @@
       50% { opacity: 0; }
     }
 
-    .highlight { color: #f5c2e7; }
-    .prompt { color: #f9e2af; }
-    .error { color: #f38ba8; }
+  /* Estilos generales */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-    /* Estilo para la línea de entrada (input) interactiva */
-    .input-line {
-      display: none; /* Se oculta hasta que sea requerida */
-      align-items: center;
-      margin-top: 5px;
-    }
+body {
+  background-color: #0f0f1a;
+  color: #a6e3a1; /* Verde suave de terminal para el sistema */
+  font-family: 'Courier New', Courier, monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
 
-    .input-line.active {
-      display: flex;
-    }
+.terminal-container {
+  width: 100%;
+  max-width: 650px;
+  background: #181825;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid #313244;
+  overflow: hidden;
+}
 
-    .cmd-input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #00ffcc;
-      font-family: inherit;
-      font-size: inherit;
-      width: 100%;
-      margin-left: 8px;
-    }
+.terminal-header {
+  background: #11111b;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #313244;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.btn-close { background-color: #f38ba8; }
+.btn-minimize { background-color: #f9e2af; }
+.btn-maximize { background-color: #a6e3a1; }
+
+.title {
+  color: #a6adc8;
+  font-size: 0.85rem;
+  margin-left: 15px;
+  font-weight: bold;
+}
+
+.terminal-body {
+  padding: 25px;
+  height: 420px;
+  overflow-y: auto;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ESTILOS DE COLORES Y SEPARACIÓN */
+.prompt { color: #f9e2af; }   /* Dorado */
+.sys-info { color: #89b4fa; } /* Azul claro para mensajes del sistema */
+.error { color: #f38ba8; }    /* Rojo suave */
+
+/* CARTA DESTACADA */
+.carta-titulo {
+  color: #f5c2e7; /* Rosa pastel */
+  font-weight: bold;
+  font-size: 1.1rem;
+  display: inline-block;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.carta-texto {
+  color: #f9e2af; /* Amarillo / Dorado suave */
+  display: inline-block;
+  margin-bottom: 12px;
+  line-height: 1.7;
+}
+
+.cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background-color: #89b4fa;
+  animation: blink 0.8s infinite;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.input-line {
+  display: none;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.input-line.active {
+  display: flex;
+}
+
+.cmd-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f9e2af;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+  margin-left: 8px;
+}
   </style>
 </head>
 <body>
@@ -148,32 +247,33 @@
     const CLAVE_CORRECTA = "5";
 
     // Fase 1: Mensaje inicial pidiendo contraseña
-    const lineasIniciales = [
-      { texto: "[SYSTEM] Acceso restringido al servidor del corazón...\n", clase: "error", retardo: 40 },
-      { texto: "[SYSTEM] Ingrese nuestros años de amor juntos para continuar:\n", clase: "highlight", retardo: 40 }
-    ];
+    // Fase 1: Mensaje inicial
+const lineasIniciales = [
+  { texto: "[SYSTEM] Acceso restringido al servidor del corazón...\n\n", clase: "error", retardo: 40 },
+  { texto: "Ingrese nuestros años de amor juntos para continuar:\n", clase: "prompt", retardo: 40 }
+];
 
-    // Fase 2: Mensaje romántico tras ingresar la contraseña correcta
-   const lineasSecretas = [
+// Fase 2: Mensaje romántico bien separado y coloreado
+const lineasSecretas = [
   { texto: "\n[OK] Acceso concedido. Bienvenido/a.\n\n", clase: "prompt", retardo: 30 },
-  { texto: "user@love:~$ python3 ejecutar_amor.py\n", clase: "prompt", retardo: 50 },
-  { texto: "[SYSTEM] Cargando recuerdos inolvidables... [OK]\n", clase: "", retardo: 40 },
-  { texto: "[SYSTEM] Verificando compatibilidad de corazones... 100%\n\n", clase: "", retardo: 40 },
+  { texto: "user@love:~$ python3 ejecutar_amor.py\n\n", clase: "prompt", retardo: 50 },
+  { texto: "[SYSTEM] Cargando recuerdos inolvidables... [OK]\n", clase: "sys-info", retardo: 40 },
+  { texto: "[SYSTEM] Verificando compatibilidad de corazones... 100%\n\n", clase: "sys-info", retardo: 40 },
   
-  // --- MENSAJE COMPLETO (3 EN 1) ---
-  { texto: "Para el amor de mi vida:\n\n", clase: "highlight", retardo: 60 },
+  // SECCIÓN DE LA CARTA (Con espacio y color único)
+  { texto: "───────────────────────────────────────────────\n", clase: "carta-titulo", retardo: 10 },
+  { texto: " Para el amor de mi vida:\n", clase: "carta-titulo", retardo: 60 },
+  { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
   
-  // Bloque 1: El código favorito y la mejor coincidencia
-  { texto: "Cada día a tu lado es mi código favorito, mi lugar seguro y mi mejor coincidencia.\n\n", clase: "", retardo: 50 },
+  { texto: "Cada día a tu lado es mi código favorito, mi lugar seguro y mi mejor coincidencia.\n\n", clase: "carta-texto", retardo: 45 },
   
-  // Bloque 2: Toque poético/técnico
-  { texto: "Si mi vida fuera un algoritmo, tú serías la única constante que jamás cambiaría por nada. Entre tantos procesos y ruido en el mundo, encontrarte fue lo mejor que me pudo pasar.\n\n", clase: "", retardo: 50 },
+  { texto: "Si mi vida fuera un algoritmo, tú serías la única constante que jamás cambiaría por nada. Entre tantos procesos y ruido en el mundo, encontrarte fue lo mejor que me pudo pasar.\n\n", clase: "carta-texto", retardo: 45 },
   
-  // Bloque 3: Cierre dulce
-  { texto: "De todas las historias que existen, la nuestra es mi favorita, y te elijo hoy, mañana y en cada versión de mi vida. ❤️\n\n", clase: "highlight", retardo: 50 },
+  { texto: "De todas las historias que existen, la nuestra es mi favorita, y te elijo hoy, mañana y en cada versión de mi vida. ❤️\n\n", clase: "carta-texto", retardo: 45 },
   
+  { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
   { texto: "user@love:~$ ", clase: "prompt", retardo: 200 },
-  { texto: "echo 'Te amo con todo mi corazón' > para_siempre.txt", clase: "", retardo: 50 }
+  { texto: "echo 'Te amo con todo mi corazón' > para_siempre.txt", clase: "sys-info", retardo: 50 }
 ];
 
     let indiceLinea = 0;
