@@ -1,289 +1,33 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terminal Especial</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+function crearCorazonesFondo() {
+  const container = document.getElementById('hearts-container');
+  const simbolos = ['❤️', '💖', '💕', '✨'];
+  
+  setInterval(() => {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    
+    // Elegir un símbolo aleatorio
+    heart.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+    
+    // Posición horizontal aleatoria
+    heart.style.left = Math.random() * 100 + 'vw';
+    
+    // Duración de la animación aleatoria (entre 4 y 8 segundos)
+    const duracion = Math.random() * 4 + 4;
+    heart.style.animationDuration = duracion + 's';
+    
+    // Tamaños variados para dar profundidad
+    const tamano = Math.random() * 0.8 + 0.8;
+    heart.style.fontSize = tamano + 'rem';
+    
+    container.appendChild(heart);
+    
+    // Limpiar el elemento del DOM al terminar la animación
+    setTimeout(() => {
+      heart.remove();
+    }, duracion * 1000);
+  }, 400); // Crea un corazón nuevo cada 400ms
+}
 
-    body {
-      background-color: #0f0f1a;
-      color: #a6e3a1; /* Verde suave de terminal para el sistema */
-      font-family: 'Courier New', Courier, monospace;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .terminal-container {
-      width: 100%;
-      max-width: 650px;
-      background: #181825;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      border: 1px solid #313244;
-      overflow: hidden;
-    }
-
-    .terminal-header {
-      background: #11111b;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid #313244;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      display: inline-block;
-    }
-
-    .btn-close { background-color: #f38ba8; }
-    .btn-minimize { background-color: #f9e2af; }
-    .btn-maximize { background-color: #a6e3a1; }
-
-    .title {
-      color: #a6adc8;
-      font-size: 0.85rem;
-      margin-left: 15px;
-      font-weight: bold;
-    }
-
-    .terminal-body {
-      padding: 25px;
-      height: 420px;
-      overflow-y: auto;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    /* ESTILOS DE COLORES Y SEPARACIÓN */
-    .prompt { color: #f9e2af; }   /* Dorado */
-    .sys-info { color: #89b4fa; } /* Azul claro para mensajes del sistema */
-    .error { color: #f38ba8; }    /* Rojo suave */
-
-    /* CARTA DESTACADA */
-    .carta-titulo {
-      color: #f5c2e7; /* Rosa pastel */
-      font-weight: bold;
-      font-size: 1.1rem;
-      display: inline-block;
-      margin-top: 15px;
-      margin-bottom: 10px;
-    }
-
-    .carta-texto {
-      color: #f9e2af; /* Amarillo / Dorado suave */
-      display: inline-block;
-      margin-bottom: 12px;
-      line-height: 1.7;
-    }
-
-    .cursor {
-      display: inline-block;
-      width: 8px;
-      height: 15px;
-      background-color: #89b4fa;
-      animation: blink 0.8s infinite;
-      vertical-align: middle;
-      margin-left: 2px;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    .input-line {
-      display: none;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .input-line.active {
-      display: flex;
-    }
-
-    .cmd-input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #f9e2af;
-      font-family: inherit;
-      font-size: inherit;
-      width: 100%;
-      margin-left: 8px;
-    }
-  </style>
-</head>
-<body>
-
-  <audio id="musica-fondo" loop preload="auto">
-    <source src="cancion.mp3.mp3" type="audio/mpeg">
-  </audio>
-
-  <div class="terminal-container">
-    <div class="terminal-header">
-      <div class="buttons">
-        <span class="btn btn-close"></span>
-        <span class="btn btn-minimize"></span>
-        <span class="btn btn-maximize"></span>
-      </div>
-      <div class="title">bash - love_script.sh</div>
-    </div>
-    <div class="terminal-body" id="terminal">
-      <span id="output"></span>
-      
-      <!-- Bloque para la respuesta de la usuaria -->
-      <div class="input-line" id="input-container">
-        <span class="prompt">clave_acceso:~$ </span>
-        <input type="password" id="user-input" class="cmd-input" autofocus autocomplete="off">
-      </div>
-      
-      <span class="cursor" id="cursor-main"></span>
-    </div>
-  </div>
-
-  <script>
-    const outputElement = document.getElementById('output');
-    const terminalBody = document.getElementById('terminal');
-    const inputContainer = document.getElementById('input-container');
-    const userInput = document.getElementById('user-input');
-    const cursorMain = document.getElementById('cursor-main');
-
-    const CLAVE_CORRECTA = "5";
-
-    const lineasIniciales = [
-      { texto: "[SYSTEM] Acceso restringido al servidor del corazón...\n\n", clase: "error", retardo: 40 },
-      { texto: "Ingrese nuestros años de amor juntos para continuar:\n", clase: "prompt", retardo: 40 }
-    ];
-
-    const lineasSecretas = [
-      { texto: "\n[OK] Acceso concedido. Bienvenido/a.\n\n", clase: "prompt", retardo: 30 },
-      { texto: "user@love:~$ python3 ejecutar_amor.py\n\n", clase: "prompt", retardo: 50 },
-      { texto: "[SYSTEM] Cargando recuerdos inolvidables... [OK]\n", clase: "sys-info", retardo: 40 },
-      { texto: "[SYSTEM] Verificando compatibilidad de corazones... 100%\n\n", clase: "sys-info", retardo: 40 },
-      
-      { texto: "───────────────────────────────────────────────\n", clase: "carta-titulo", retardo: 10 },
-      { texto: " Para el amor de mi vida:\n", clase: "carta-titulo", retardo: 60 },
-      { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
-      
-      { texto: "Cada día a tu lado es mi código favorito, mi lugar seguro y mi mejor coincidencia.\n\n", clase: "carta-texto", retardo: 45 },
-      { texto: "Si mi vida fuera un algoritmo, tú serías la única constante que jamás cambiaría por nada. Entre tantos procesos y ruido en el mundo, encontrarte fue lo mejor que me pudo pasar.\n\n", clase: "carta-texto", retardo: 45 },
-      { texto: "De todas las historias que existen, la nuestra es mi favorita, y te elijo hoy, mañana y en cada versión de mi vida. ❤️\n\n", clase: "carta-texto", retardo: 45 },
-      
-      { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
-      { texto: "user@love:~$ ", clase: "prompt", retardo: 200 },
-      { texto: "echo 'Te amo con todo mi corazón' > para_siempre.txt", clase: "sys-info", retardo: 50 }
-    ];
-
-    let indiceLinea = 0;
-    let indiceCaracter = 0;
-    let lineasActuales = lineasIniciales;
-
-    function esperar(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    async function escribirTerminal(alTerminar) {
-      if (indiceLinea >= lineasActuales.length) {
-        if (alTerminar) alTerminar();
-        return;
-      }
-
-      const lineaActual = lineasActuales[indiceLinea];
-
-      if (indiceCaracter === 0 && lineaActual.clase) {
-        const span = document.createElement('span');
-        span.className = lineaActual.clase;
-        span.id = `span-${indiceLinea}-${Date.now()}`;
-        outputElement.appendChild(span);
-      }
-
-      const contenedorTexto = lineaActual.clase 
-        ? outputElement.lastElementChild 
-        : outputElement;
-
-      const caracterActual = lineaActual.texto[indiceCaracter];
-
-      if (caracterActual === '\n') {
-        outputElement.appendChild(document.createElement('br'));
-      } else {
-        contenedorTexto.textContent += caracterActual;
-      }
-
-      terminalBody.scrollTop = terminalBody.scrollHeight;
-      indiceCaracter++;
-
-      if (indiceCaracter < lineaActual.texto.length) {
-        setTimeout(() => escribirTerminal(alTerminar), lineaActual.retardo);
-      } else {
-        indiceLinea++;
-        indiceCaracter = 0;
-        await esperar(300);
-        escribirTerminal(alTerminar);
-      }
-    }
-
-    function solicitarContrasena() {
-      cursorMain.style.display = 'none';
-      inputContainer.classList.add('active');
-      userInput.focus();
-    }
-
-    userInput.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
-        const valorIngresado = userInput.value.trim();
-
-        if (valorIngresado === CLAVE_CORRECTA) {
-          const musica = document.getElementById('musica-fondo');
-          if (musica) {
-            musica.volume = 0.5;
-            musica.play().catch(e => {
-              console.log("Autoplay bloqueado. Esperando interacción:", e);
-              document.addEventListener('click', () => musica.play(), { once: true });
-              document.addEventListener('touchstart', () => musica.play(), { once: true });
-            });
-          }
-
-          inputContainer.classList.remove('active');
-          cursorMain.style.display = 'inline-block';
-          
-          lineasActuales = lineasSecretas;
-          indiceLinea = 0;
-          indiceCaracter = 0;
-          escribirTerminal();
-        } else {
-          outputElement.appendChild(document.createElement('br'));
-          const spanError = document.createElement('span');
-          spanError.className = 'error';
-          spanError.textContent = '[ERROR] Respuesta incorrecta. Inténtalo de nuevo:\n';
-          outputElement.appendChild(spanError);
-          outputElement.appendChild(document.createElement('br'));
-          
-          userInput.value = '';
-          terminalBody.scrollTop = terminalBody.scrollHeight;
-        }
-      }
-    });
-
-    window.onload = () => {
-      setTimeout(() => escribirTerminal(solicitarContrasena), 800);
-    };
-  </script>
-</body>
-</html>
+// Iniciar los corazones al cargar la página
+window.addEventListener('DOMContentLoaded', crearCorazonesFondo);
