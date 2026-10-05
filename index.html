@@ -13,7 +13,7 @@
 
     body {
       background-color: #0f0f1a;
-      color: #00ffcc;
+      color: #a6e3a1; /* Verde suave de terminal para el sistema */
       font-family: 'Courier New', Courier, monospace;
       display: flex;
       justify-content: center;
@@ -64,18 +64,40 @@
     }
 
     .terminal-body {
-      padding: 20px;
-      height: 380px;
+      padding: 25px;
+      height: 420px;
       overflow-y: auto;
       font-size: 0.95rem;
       line-height: 1.6;
+    }
+
+    /* ESTILOS DE COLORES Y SEPARACIÓN */
+    .prompt { color: #f9e2af; }   /* Dorado */
+    .sys-info { color: #89b4fa; } /* Azul claro para mensajes del sistema */
+    .error { color: #f38ba8; }    /* Rojo suave */
+
+    /* CARTA DESTACADA */
+    .carta-titulo {
+      color: #f5c2e7; /* Rosa pastel */
+      font-weight: bold;
+      font-size: 1.1rem;
+      display: inline-block;
+      margin-top: 15px;
+      margin-bottom: 10px;
+    }
+
+    .carta-texto {
+      color: #f9e2af; /* Amarillo / Dorado suave */
+      display: inline-block;
+      margin-bottom: 12px;
+      line-height: 1.7;
     }
 
     .cursor {
       display: inline-block;
       width: 8px;
       height: 15px;
-      background-color: #00ffcc;
+      background-color: #89b4fa;
       animation: blink 0.8s infinite;
       vertical-align: middle;
       margin-left: 2px;
@@ -86,137 +108,33 @@
       50% { opacity: 0; }
     }
 
-  /* Estilos generales */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+    .input-line {
+      display: none;
+      align-items: center;
+      margin-top: 10px;
+    }
 
-body {
-  background-color: #0f0f1a;
-  color: #a6e3a1; /* Verde suave de terminal para el sistema */
-  font-family: 'Courier New', Courier, monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-}
+    .input-line.active {
+      display: flex;
+    }
 
-.terminal-container {
-  width: 100%;
-  max-width: 650px;
-  background: #181825;
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  border: 1px solid #313244;
-  overflow: hidden;
-}
-
-.terminal-header {
-  background: #11111b;
-  padding: 10px 15px;
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid #313244;
-}
-
-.buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.btn {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.btn-close { background-color: #f38ba8; }
-.btn-minimize { background-color: #f9e2af; }
-.btn-maximize { background-color: #a6e3a1; }
-
-.title {
-  color: #a6adc8;
-  font-size: 0.85rem;
-  margin-left: 15px;
-  font-weight: bold;
-}
-
-.terminal-body {
-  padding: 25px;
-  height: 420px;
-  overflow-y: auto;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-/* ESTILOS DE COLORES Y SEPARACIÓN */
-.prompt { color: #f9e2af; }   /* Dorado */
-.sys-info { color: #89b4fa; } /* Azul claro para mensajes del sistema */
-.error { color: #f38ba8; }    /* Rojo suave */
-
-/* CARTA DESTACADA */
-.carta-titulo {
-  color: #f5c2e7; /* Rosa pastel */
-  font-weight: bold;
-  font-size: 1.1rem;
-  display: inline-block;
-  margin-top: 15px;
-  margin-bottom: 10px;
-}
-
-.carta-texto {
-  color: #f9e2af; /* Amarillo / Dorado suave */
-  display: inline-block;
-  margin-bottom: 12px;
-  line-height: 1.7;
-}
-
-.cursor {
-  display: inline-block;
-  width: 8px;
-  height: 15px;
-  background-color: #89b4fa;
-  animation: blink 0.8s infinite;
-  vertical-align: middle;
-  margin-left: 2px;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.input-line {
-  display: none;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.input-line.active {
-  display: flex;
-}
-
-.cmd-input {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #f9e2af;
-  font-family: inherit;
-  font-size: inherit;
-  width: 100%;
-  margin-left: 8px;
-}
+    .cmd-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #f9e2af;
+      font-family: inherit;
+      font-size: inherit;
+      width: 100%;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
-<!-- Agrega esto justo debajo de <body> -->
-<audio id="musica-fondo" loop preload="auto">
-  <source src="cancion.mp3.mp3" type="audio/mpeg">
-</audio>
+
+  <audio id="musica-fondo" loop preload="auto">
+    <source src="cancion.mp3.mp3" type="audio/mpeg">
+  </audio>
 
   <div class="terminal-container">
     <div class="terminal-header">
@@ -247,38 +165,31 @@ body {
     const userInput = document.getElementById('user-input');
     const cursorMain = document.getElementById('cursor-main');
 
-    // Clave secreta definida (puedes cambiarla por una fecha o palabra clave)
     const CLAVE_CORRECTA = "5";
 
-    // Fase 1: Mensaje inicial pidiendo contraseña
-    // Fase 1: Mensaje inicial
-const lineasIniciales = [
-  { texto: "[SYSTEM] Acceso restringido al servidor del corazón...\n\n", clase: "error", retardo: 40 },
-  { texto: "Ingrese nuestros años de amor juntos para continuar:\n", clase: "prompt", retardo: 40 }
-];
+    const lineasIniciales = [
+      { texto: "[SYSTEM] Acceso restringido al servidor del corazón...\n\n", clase: "error", retardo: 40 },
+      { texto: "Ingrese nuestros años de amor juntos para continuar:\n", clase: "prompt", retardo: 40 }
+    ];
 
-// Fase 2: Mensaje romántico bien separado y coloreado
-const lineasSecretas = [
-  { texto: "\n[OK] Acceso concedido. Bienvenido/a.\n\n", clase: "prompt", retardo: 30 },
-  { texto: "user@love:~$ python3 ejecutar_amor.py\n\n", clase: "prompt", retardo: 50 },
-  { texto: "[SYSTEM] Cargando recuerdos inolvidables... [OK]\n", clase: "sys-info", retardo: 40 },
-  { texto: "[SYSTEM] Verificando compatibilidad de corazones... 100%\n\n", clase: "sys-info", retardo: 40 },
-  
-  // SECCIÓN DE LA CARTA (Con espacio y color único)
-  { texto: "───────────────────────────────────────────────\n", clase: "carta-titulo", retardo: 10 },
-  { texto: " Para el amor de mi vida:\n", clase: "carta-titulo", retardo: 60 },
-  { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
-  
-  { texto: "Cada día a tu lado es mi código favorito, mi lugar seguro y mi mejor coincidencia.\n\n", clase: "carta-texto", retardo: 45 },
-  
-  { texto: "Si mi vida fuera un algoritmo, tú serías la única constante que jamás cambiaría por nada. Entre tantos procesos y ruido en el mundo, encontrarte fue lo mejor que me pudo pasar.\n\n", clase: "carta-texto", retardo: 45 },
-  
-  { texto: "De todas las historias que existen, la nuestra es mi favorita, y te elijo hoy, mañana y en cada versión de mi vida. ❤️\n\n", clase: "carta-texto", retardo: 45 },
-  
-  { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
-  { texto: "user@love:~$ ", clase: "prompt", retardo: 200 },
-  { texto: "echo 'Te amo con todo mi corazón' > para_siempre.txt", clase: "sys-info", retardo: 50 }
-];
+    const lineasSecretas = [
+      { texto: "\n[OK] Acceso concedido. Bienvenido/a.\n\n", clase: "prompt", retardo: 30 },
+      { texto: "user@love:~$ python3 ejecutar_amor.py\n\n", clase: "prompt", retardo: 50 },
+      { texto: "[SYSTEM] Cargando recuerdos inolvidables... [OK]\n", clase: "sys-info", retardo: 40 },
+      { texto: "[SYSTEM] Verificando compatibilidad de corazones... 100%\n\n", clase: "sys-info", retardo: 40 },
+      
+      { texto: "───────────────────────────────────────────────\n", clase: "carta-titulo", retardo: 10 },
+      { texto: " Para el amor de mi vida:\n", clase: "carta-titulo", retardo: 60 },
+      { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
+      
+      { texto: "Cada día a tu lado es mi código favorito, mi lugar seguro y mi mejor coincidencia.\n\n", clase: "carta-texto", retardo: 45 },
+      { texto: "Si mi vida fuera un algoritmo, tú serías la única constante que jamás cambiaría por nada. Entre tantos procesos y ruido en el mundo, encontrarte fue lo mejor que me pudo pasar.\n\n", clase: "carta-texto", retardo: 45 },
+      { texto: "De todas las historias que existen, la nuestra es mi favorita, y te elijo hoy, mañana y en cada versión de mi vida. ❤️\n\n", clase: "carta-texto", retardo: 45 },
+      
+      { texto: "───────────────────────────────────────────────\n\n", clase: "carta-titulo", retardo: 10 },
+      { texto: "user@love:~$ ", clase: "prompt", retardo: 200 },
+      { texto: "echo 'Te amo con todo mi corazón' > para_siempre.txt", clase: "sys-info", retardo: 50 }
+    ];
 
     let indiceLinea = 0;
     let indiceCaracter = 0;
@@ -328,40 +239,49 @@ const lineasSecretas = [
       }
     }
 
-    // Activar el campo para ingresar la contraseña
     function solicitarContrasena() {
-      cursorMain.style.display = 'none'; // Ocultar cursor estático
-      inputContainer.classList.add('active'); // Mostrar el input
+      cursorMain.style.display = 'none';
+      inputContainer.classList.add('active');
       userInput.focus();
     }
 
-    // Escuchar cuando presione la tecla Enter
     userInput.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    const valorIngresado = userInput.value.trim();
+      if (event.key === 'Enter') {
+        const valorIngresado = userInput.value.trim();
 
-    if (valorIngresado === CLAVE_CORRECTA) {
-      // 🎵 REPRODUCIR MÚSICA AL INGRESAR LA CLAVE
-      const musica = document.getElementById('musica-fondo');
-      if (musica) {
-        musica.volume = 0.5; // Ajusta el volumen (0.0 a 1.0)
-        musica.play().catch(e => console.log("Error al reproducir audio:", e));
+        if (valorIngresado === CLAVE_CORRECTA) {
+          const musica = document.getElementById('musica-fondo');
+          if (musica) {
+            musica.volume = 0.5;
+            musica.play().catch(e => {
+              console.log("Autoplay bloqueado. Esperando interacción:", e);
+              document.addEventListener('click', () => musica.play(), { once: true });
+              document.addEventListener('touchstart', () => musica.play(), { once: true });
+            });
+          }
+
+          inputContainer.classList.remove('active');
+          cursorMain.style.display = 'inline-block';
+          
+          lineasActuales = lineasSecretas;
+          indiceLinea = 0;
+          indiceCaracter = 0;
+          escribirTerminal();
+        } else {
+          outputElement.appendChild(document.createElement('br'));
+          const spanError = document.createElement('span');
+          spanError.className = 'error';
+          spanError.textContent = '[ERROR] Respuesta incorrecta. Inténtalo de nuevo:\n';
+          outputElement.appendChild(spanError);
+          outputElement.appendChild(document.createElement('br'));
+          
+          userInput.value = '';
+          terminalBody.scrollTop = terminalBody.scrollHeight;
+        }
       }
+    });
 
-      inputContainer.classList.remove('active');
-      cursorMain.style.display = 'inline-block';
-      
-      lineasActuales = lineasSecretas;
-      indiceLinea = 0;
-      indiceCaracter = 0;
-      escribirTerminal();
-    } else {
-      // Manejo de error...
-    }
-  }
-});
     window.onload = () => {
-      // Iniciar la primera fase (pedir contraseña)
       setTimeout(() => escribirTerminal(solicitarContrasena), 800);
     };
   </script>
