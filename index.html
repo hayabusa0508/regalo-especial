@@ -20,9 +20,51 @@
       align-items: center;
       min-height: 100vh;
       padding: 20px;
+      overflow: hidden; /* Evita barras de desplazamiento por los corazones */
     }
 
+    /* CAPA DE CORAZONES EN SEGUNDO PLANO */
+    .bg-hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none; /* No interfiere con clics o toque de pantalla */
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -30px;
+      font-size: 1.2rem;
+      opacity: 0;
+      user-select: none;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(0.8) rotate(0deg);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.7;
+      }
+      80% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-105vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* TERMINAL POR ENCIMA DE LOS CORAZONES */
     .terminal-container {
+      position: relative;
+      z-index: 10;
       width: 100%;
       max-width: 650px;
       background: #181825;
@@ -128,53 +170,12 @@
       width: 100%;
       margin-left: 8px;
     }
-
-    /* Contenedor para los corazones en segundo plano */
-.bg-hearts {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none; /* Para que no interfiera al tocar o hacer clic en la pantalla */
-  overflow: hidden;
-  z-index: 0;
-}
-
-/* Animación y estilo de cada corazón */
-.heart {
-  position: absolute;
-  bottom: -20px;
-  font-size: 1.2rem;
-  opacity: 0.6;
-  user-select: none;
-  animation: floatUp linear infinite;
-}
-
-@keyframes floatUp {
-  0% {
-    transform: translateY(0) scale(0.8) rotate(0deg);
-    opacity: 0;
-  }
-  20% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(-105vh) scale(1.2) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* Asegurar que la terminal quede por encima de los corazones */
-.terminal-container {
-  position: relative;
-  z-index: 10;
-}
   </style>
 </head>
 <body>
 
-<div class="bg-hearts" id="hearts-container"></div>
+  <!-- Contenedor para la lluvia de corazones -->
+  <div class="bg-hearts" id="hearts-container"></div>
 
   <audio id="musica-fondo" loop preload="auto">
     <source src="cancion.mp3.mp3" type="audio/mpeg">
@@ -241,6 +242,32 @@
 
     function esperar(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Función para generar la lluvia de corazones flotantes
+    function crearCorazonesFondo() {
+      const container = document.getElementById('hearts-container');
+      const simbolos = ['❤️', '💖', '💕', '✨'];
+      
+      setInterval(() => {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        
+        heart.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+        heart.style.left = Math.random() * 100 + 'vw';
+        
+        const duracion = Math.random() * 4 + 4;
+        heart.style.animationDuration = duracion + 's';
+        
+        const tamano = Math.random() * 0.8 + 0.8;
+        heart.style.fontSize = tamano + 'rem';
+        
+        container.appendChild(heart);
+        
+        setTimeout(() => {
+          heart.remove();
+        }, duracion * 1000);
+      }, 400);
     }
 
     async function escribirTerminal(alTerminar) {
@@ -325,41 +352,8 @@
       }
     });
 
-    function crearCorazonesFondo() {
-  const container = document.getElementById('hearts-container');
-  const simbolos = ['❤️', '💖', '💕', '✨'];
-  
-  setInterval(() => {
-    const heart = document.createElement('div');
-    heart.className = 'heart';
-    
-    // Elegir un símbolo aleatorio
-    heart.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
-    
-    // Posición horizontal aleatoria
-    heart.style.left = Math.random() * 100 + 'vw';
-    
-    // Duración de la animación aleatoria (entre 4 y 8 segundos)
-    const duracion = Math.random() * 4 + 4;
-    heart.style.animationDuration = duracion + 's';
-    
-    // Tamaños variados para dar profundidad
-    const tamano = Math.random() * 0.8 + 0.8;
-    heart.style.fontSize = tamano + 'rem';
-    
-    container.appendChild(heart);
-    
-    // Limpiar el elemento del DOM al terminar la animación
-    setTimeout(() => {
-      heart.remove();
-    }, duracion * 1000);
-  }, 400); // Crea un corazón nuevo cada 400ms
-}
-
-// Iniciar los corazones al cargar la página
-window.addEventListener('DOMContentLoaded', crearCorazonesFondo);
-
     window.onload = () => {
+      crearCorazonesFondo();
       setTimeout(() => escribirTerminal(solicitarContrasena), 800);
     };
   </script>
